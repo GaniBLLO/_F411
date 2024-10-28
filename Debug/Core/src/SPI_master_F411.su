@@ -1,0 +1,10 @@
+../Core/src/SPI_master_F411.c:14:13:ARM_SPI_Initialize	4	static
+../Core/src/SPI_master_F411.c:18:13:ARM_SPI_Uninitialize	4	static
+../Core/src/SPI_master_F411.c:22:16:ARM_SPI_PowerControl	16	static
+../Core/src/SPI_master_F411.c:38:16:ARM_SPI_Send	16	static
+../Core/src/SPI_master_F411.c:42:16:ARM_SPI_Receive	16	static
+../Core/src/SPI_master_F411.c:46:16:ARM_SPI_Transfer	24	static
+../Core/src/SPI_master_F411.c:50:17:ARM_SPI_GetDataCount	4	static
+../Core/src/SPI_master_F411.c:54:16:ARM_SPI_Control	16	static
+../Core/src/SPI_master_F411.c:87:23:ARM_SPI_GetStatus	4	static
+../Core/src/SPI_master_F411.c:91:13:ARM_SPI_SignalEvent	16	static
