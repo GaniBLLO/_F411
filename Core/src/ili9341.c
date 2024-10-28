@@ -7,24 +7,23 @@ static void ILI9341_Select() {
 	ILI9341_RES_OFF;
 }
 
-//void ILI9341_Unselect() {
+void ILI9341_Unselect() {
 //    HAL_GPIO_WritePin(ILI9341_CS_GPIO_Port, ILI9341_CS_Pin, GPIO_PIN_SET);
-//}
+	ILI9341_RES_On;
+}
+
 
 static void ILI9341_Reset() {
 	ILI9341_RES_OFF;
-
-	Del_ay();
+	dMs(5);
 	ILI9341_RES_On;
-    HAL_GPIO_WritePin(ILI9341_RES_GPIO_Port, ILI9341_RES_Pin, GPIO_PIN_RESET);
-    HAL_Delay(5);
-    HAL_GPIO_WritePin(ILI9341_RES_GPIO_Port, ILI9341_RES_Pin, GPIO_PIN_SET);
 }
 
-//static void ILI9341_WriteCommand(uint8_t cmd) {
+static void ILI9341_WriteCommand(uint8_t cmd) {
 //    HAL_GPIO_WritePin(ILI9341_DC_GPIO_Port, ILI9341_DC_Pin, GPIO_PIN_RESET);
-//    HAL_SPI_Transmit(&ILI9341_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
-//}
+	ILI9341_RES_OFF;
+    HAL_SPI_Transmit(&ILI9341_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+}
 //
 //static void ILI9341_WriteData(uint8_t* buff, size_t buff_size) {
 //    HAL_GPIO_WritePin(ILI9341_DC_GPIO_Port, ILI9341_DC_Pin, GPIO_PIN_SET);

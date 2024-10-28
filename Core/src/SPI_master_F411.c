@@ -12,6 +12,7 @@
 //  Functions
 //
 static bool ARM_SPI_Initialize(void){
+
 	return 0;
 }
 

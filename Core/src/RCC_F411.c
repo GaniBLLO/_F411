@@ -6,6 +6,7 @@
  */
 #include "RCC_F411.h"
 
+static uint32_t TICK = 0;
 void RCC_Init(void){
 
 	//Enable internal High-speed clock
@@ -111,4 +112,41 @@ void Systick_init(void){
 
 	//Enb. count
 	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+}
+
+void Tim11_init(void){
+	/* Init TIM11 channel 1 (PB9)???Is it needed?
+	 * Altenative function -> AF03 */
+
+	//Enb. enable bus clocking
+	RCC->APB2ENR |= RCC_APB2ENR_TIM11EN;
+
+	//Dis.CNT
+	TIM11->CR1 &= ~TIM_CR1_CEN;
+	//Enb. UEV
+	TIM11->CR1 &= ~TIM_CR1_UDIS;
+	//Only cnt overflow generate UEV!
+	TIM11->CR1 |= TIM_CR1_URS;
+	//Enb. UIE(update interrupt enable)
+	TIM11->DIER |= TIM_DIER_UIE;
+	//Enb. Update generation
+	TIM11->EGR |= TIM_EGR_UG;
+	//Count & ARR
+	TIM11->CNT = 0;
+	TIM11->PSC = 1;
+	TIM11->ARR = 49999;
+	//Enable IRQ for tim11
+	NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+}
+
+void TIM1_TRG_COM_TIM11_IRQHandler(void){
+	TICK++;
+	TIM11->SR &= ~TIM_SR_UIF;
+}
+
+void dMs(uint32_t times){
+	TIM11->CR1 |= TIM_CR1_CEN;
+	TICK = 0;
+	while(TICK<(times*1000));
+	TIM11->CR1 &= ~TIM_CR1_CEN;
 }

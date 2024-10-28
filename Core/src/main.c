@@ -20,9 +20,6 @@
 #include "RCC_F411.h"
 #include "SPI_master_F411.h"
 
-
-
-
 #define Enable_RTOS	0
 
 #if Enable_RTOS
@@ -33,6 +30,8 @@
 
 void RCC_Init(void);
 void Systick_init(void);
+void GPIO_LCD_Init(void);
+void Tim11_init(void);
 
 
 int main(void)
@@ -43,6 +42,7 @@ int main(void)
 
 	//*******************Init GPIOs
 	GPIO_LCD_Init();
+	Tim11_init();
 //	GPIO_SD_Init();
 //	GPIO_UART_Init();
 //	GPIO_ETH_Init();
