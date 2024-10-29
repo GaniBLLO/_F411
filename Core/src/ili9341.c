@@ -2,6 +2,9 @@
 
 #include "ili9341.h"
 
+
+SPI_ ILI9341_SPI_PORT;
+
 static void ILI9341_Select() {
 //    HAL_GPIO_WritePin(ILI9341_CS_GPIO_Port, ILI9341_CS_Pin, GPIO_PIN_RESET);
 	ILI9341_RES_OFF;
@@ -15,14 +18,14 @@ void ILI9341_Unselect() {
 
 static void ILI9341_Reset() {
 	ILI9341_RES_OFF;
-	dMs(5);
+	dMs(1);
 	ILI9341_RES_On;
 }
 
 static void ILI9341_WriteCommand(uint8_t cmd) {
 //    HAL_GPIO_WritePin(ILI9341_DC_GPIO_Port, ILI9341_DC_Pin, GPIO_PIN_RESET);
 	ILI9341_RES_OFF;
-    HAL_SPI_Transmit(&ILI9341_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+//    HAL_SPI_Transmit(&ILI9341_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
 }
 //
 //static void ILI9341_WriteData(uint8_t* buff, size_t buff_size) {
@@ -120,162 +123,172 @@ void GPIO_LCD_Init(void){
 	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED9_1;
 	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD9;
 	GPIOA->BSRR &= ~GPIO_BSRR_BR9;
-
 }
 
+void ttt(SPI_ *SPIx){
+	SPIx->SpiREGS->CR1 = 0;
+	SPIx->SpiREGS->CR1= 0;
+	SPIx->SpiREGS->CR2 = 0;
+}
 void ILI9341_Init() {
+
+	ILI9341_SPI_PORT.SpiREGS = SPI1;
+	ILI9341_SPI_PORT.init = ttt;
+	ILI9341_SPI_PORT.init(&ILI9341_SPI_PORT);
+
+	GPIO_LCD_Init();
     ILI9341_Select();
     ILI9341_Reset();
-
     // command list is based on https://github.com/martnak/STM32-ILI9341
 
-    // SOFTWARE RESET
-    ILI9341_WriteCommand(0x01);
-    HAL_Delay(1000);
-
-    // POWER CONTROL A
-    ILI9341_WriteCommand(0xCB);
-    {
-        uint8_t data[] = { 0x39, 0x2C, 0x00, 0x34, 0x02 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // POWER CONTROL B
-    ILI9341_WriteCommand(0xCF);
-    {
-        uint8_t data[] = { 0x00, 0xC1, 0x30 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // DRIVER TIMING CONTROL A
-    ILI9341_WriteCommand(0xE8);
-    {
-        uint8_t data[] = { 0x85, 0x00, 0x78 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // DRIVER TIMING CONTROL B
-    ILI9341_WriteCommand(0xEA);
-    {
-        uint8_t data[] = { 0x00, 0x00 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // POWER ON SEQUENCE CONTROL
-    ILI9341_WriteCommand(0xED);
-    {
-        uint8_t data[] = { 0x64, 0x03, 0x12, 0x81 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // PUMP RATIO CONTROL
-    ILI9341_WriteCommand(0xF7);
-    {
-        uint8_t data[] = { 0x20 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // POWER CONTROL,VRH[5:0]
-    ILI9341_WriteCommand(0xC0);
-    {
-        uint8_t data[] = { 0x23 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // POWER CONTROL,SAP[2:0];BT[3:0]
-    ILI9341_WriteCommand(0xC1);
-    {
-        uint8_t data[] = { 0x10 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // VCM CONTROL
-    ILI9341_WriteCommand(0xC5);
-    {
-        uint8_t data[] = { 0x3E, 0x28 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // VCM CONTROL 2
-    ILI9341_WriteCommand(0xC7);
-    {
-        uint8_t data[] = { 0x86 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // MEMORY ACCESS CONTROL
-    ILI9341_WriteCommand(0x36);
-    {
-        uint8_t data[] = { 0x48 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // PIXEL FORMAT
-    ILI9341_WriteCommand(0x3A);
-    {
-        uint8_t data[] = { 0x55 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // FRAME RATIO CONTROL, STANDARD RGB COLOR
-    ILI9341_WriteCommand(0xB1);
-    {
-        uint8_t data[] = { 0x00, 0x18 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // DISPLAY FUNCTION CONTROL
-    ILI9341_WriteCommand(0xB6);
-    {
-        uint8_t data[] = { 0x08, 0x82, 0x27 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // 3GAMMA FUNCTION DISABLE
-    ILI9341_WriteCommand(0xF2);
-    {
-        uint8_t data[] = { 0x00 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // GAMMA CURVE SELECTED
-    ILI9341_WriteCommand(0x26);
-    {
-        uint8_t data[] = { 0x01 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // POSITIVE GAMMA CORRECTION
-    ILI9341_WriteCommand(0xE0);
-    {
-        uint8_t data[] = { 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08, 0x4E, 0xF1,
-                           0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00 };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // NEGATIVE GAMMA CORRECTION
-    ILI9341_WriteCommand(0xE1);
-    {
-        uint8_t data[] = { 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31, 0xC1,
-                           0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    // EXIT SLEEP
-    ILI9341_WriteCommand(0x11);
-    HAL_Delay(120);
-
-    // TURN ON DISPLAY
-    ILI9341_WriteCommand(0x29);
-
-    // MADCTL
-    ILI9341_WriteCommand(0x36);
-    {
-        uint8_t data[] = { ILI9341_ROTATION };
-        ILI9341_WriteData(data, sizeof(data));
-    }
-
-    ILI9341_Unselect();
+//    // SOFTWARE RESET
+//    ILI9341_WriteCommand(0x01);
+////    HAL_Delay(1000);
+//    dMs(1);
+//
+//    // POWER CONTROL A
+//    ILI9341_WriteCommand(0xCB);
+//    {
+//        uint8_t data[] = { 0x39, 0x2C, 0x00, 0x34, 0x02 };
+////        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // POWER CONTROL B
+//    ILI9341_WriteCommand(0xCF);
+//    {
+//        uint8_t data[] = { 0x00, 0xC1, 0x30 };
+////        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // DRIVER TIMING CONTROL A
+//    ILI9341_WriteCommand(0xE8);
+//    {
+//        uint8_t data[] = { 0x85, 0x00, 0x78 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // DRIVER TIMING CONTROL B
+//    ILI9341_WriteCommand(0xEA);
+//    {
+//        uint8_t data[] = { 0x00, 0x00 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // POWER ON SEQUENCE CONTROL
+//    ILI9341_WriteCommand(0xED);
+//    {
+//        uint8_t data[] = { 0x64, 0x03, 0x12, 0x81 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // PUMP RATIO CONTROL
+//    ILI9341_WriteCommand(0xF7);
+//    {
+//        uint8_t data[] = { 0x20 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // POWER CONTROL,VRH[5:0]
+//    ILI9341_WriteCommand(0xC0);
+//    {
+//        uint8_t data[] = { 0x23 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // POWER CONTROL,SAP[2:0];BT[3:0]
+//    ILI9341_WriteCommand(0xC1);
+//    {
+//        uint8_t data[] = { 0x10 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // VCM CONTROL
+//    ILI9341_WriteCommand(0xC5);
+//    {
+//        uint8_t data[] = { 0x3E, 0x28 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // VCM CONTROL 2
+//    ILI9341_WriteCommand(0xC7);
+//    {
+//        uint8_t data[] = { 0x86 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // MEMORY ACCESS CONTROL
+//    ILI9341_WriteCommand(0x36);
+//    {
+//        uint8_t data[] = { 0x48 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // PIXEL FORMAT
+//    ILI9341_WriteCommand(0x3A);
+//    {
+//        uint8_t data[] = { 0x55 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // FRAME RATIO CONTROL, STANDARD RGB COLOR
+//    ILI9341_WriteCommand(0xB1);
+//    {
+//        uint8_t data[] = { 0x00, 0x18 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // DISPLAY FUNCTION CONTROL
+//    ILI9341_WriteCommand(0xB6);
+//    {
+//        uint8_t data[] = { 0x08, 0x82, 0x27 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // 3GAMMA FUNCTION DISABLE
+//    ILI9341_WriteCommand(0xF2);
+//    {
+//        uint8_t data[] = { 0x00 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // GAMMA CURVE SELECTED
+//    ILI9341_WriteCommand(0x26);
+//    {
+//        uint8_t data[] = { 0x01 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // POSITIVE GAMMA CORRECTION
+//    ILI9341_WriteCommand(0xE0);
+//    {
+//        uint8_t data[] = { 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08, 0x4E, 0xF1,
+//                           0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00 };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // NEGATIVE GAMMA CORRECTION
+//    ILI9341_WriteCommand(0xE1);
+//    {
+//        uint8_t data[] = { 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31, 0xC1,
+//                           0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    // EXIT SLEEP
+//    ILI9341_WriteCommand(0x11);
+//    HAL_Delay(120);
+//
+//    // TURN ON DISPLAY
+//    ILI9341_WriteCommand(0x29);
+//
+//    // MADCTL
+//    ILI9341_WriteCommand(0x36);
+//    {
+//        uint8_t data[] = { ILI9341_ROTATION };
+//        ILI9341_WriteData(data, sizeof(data));
+//    }
+//
+//    ILI9341_Unselect();
 }
 
 //void ILI9341_DrawPixel(uint16_t x, uint16_t y, uint16_t color) {

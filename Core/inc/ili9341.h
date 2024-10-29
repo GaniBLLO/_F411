@@ -2,11 +2,12 @@
 #ifndef __ILI9341_H__
 #define __ILI9341_H__
 
-#include "stm32f4xx.h"
-#include "stm32f411xe.h"
+//#include "stm32f4xx.h"
+//#include "stm32f411xe.h"
 #include "RCC_F411.h"
 #include "fonts.h"
 #include <stdbool.h>
+#include "SPI_master_F411.h"
 
 #define ILI9341_MADCTL_MY  0x80
 #define ILI9341_MADCTL_MX  0x40
@@ -17,8 +18,8 @@
 #define ILI9341_MADCTL_MH  0x04
 
 /*** Redefine if necessary ***/
-#define ILI9341_SPI_PORT hspi1
-//extern SPI_HandleTypeDef ILI9341_SPI_PORT;
+//#define ILI9341_SPI_PORT hspi1
+extern SPI_ ILI9341_SPI_PORT;
 
 #define ILI9341_RES_On      GPIOA->BSRR |= GPIO_BSRR_BS12;
 #define ILI9341_RES_OFF     GPIOA->BSRR |= GPIO_BSRR_BR12;

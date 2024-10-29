@@ -122,36 +122,17 @@ typedef enum
 /**
   * @brief  SPI handle Structure definition
   */
-typedef struct __SPI_HandleTypeDef
-{
-	SPI_TypeDef		*Instance;      //SPI current status
-	SPI_InitTypeDef  Init;           /*!< SPI communication parameters             */
+typedef struct __SPI{
+	SPI_TypeDef		*SpiREGS;      //SPI REGisters
+//	SPI_InitTypeDef  Init;          //SPI communication parameters
+	uint32_t		 MOSI_pin;
+	uint32_t		 MISO_pin;
+	uint32_t		 SCK_pin;
+	uint32_t		 CS_pin;
+	uint8_t         *pTxBuffPtr;    //Pointer to SPI Tx transfer Buffer
+	uint16_t         TxXferSize;  	//SPI Tx Transfer size
+	void (*init)(struct __SPI* SPIx);
+}SPI_;
 
-  uint8_t                    *pTxBuffPtr;    /*!< Pointer to SPI Tx transfer Buffer        */
-
-  uint16_t                   TxXferSize;     /*!< SPI Tx Transfer size                     */
-
-  __IO uint16_t              TxXferCount;    /*!< SPI Tx Transfer Counter                  */
-
-  uint8_t                    *pRxBuffPtr;    /*!< Pointer to SPI Rx transfer Buffer        */
-
-  uint16_t                   RxXferSize;     /*!< SPI Rx Transfer size                     */
-
-  __IO uint16_t              RxXferCount;    /*!< SPI Rx Transfer Counter                  */
-
-  void (*RxISR)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Rx ISR       */
-
-  void (*TxISR)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Tx ISR       */
-
-  DMA_HandleTypeDef          *hdmatx;        /*!< SPI Tx DMA Handle parameters             */
-
-  DMA_HandleTypeDef          *hdmarx;        /*!< SPI Rx DMA Handle parameters             */
-
-  HAL_LockTypeDef            Lock;           /*!< Locking object                           */
-
-  __IO HAL_SPI_StateTypeDef  State;          /*!< SPI communication state                  */
-
-  __IO uint32_t              ErrorCode;      /*!< SPI Error code                           */
-
-} SPI_HandleTypeDef;
+extern SPI_ ILI9341_SPI_PORT;
 #endif /* INC_SPI_MASTER_F411_H_ */

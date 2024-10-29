@@ -30,18 +30,16 @@
 
 void RCC_Init(void);
 void Systick_init(void);
-void GPIO_LCD_Init(void);
 void Tim11_init(void);
-
+void ILI9341_Init(void);
 
 int main(void)
 {
 	//*******************Init RCC & Systick
 	RCC_Init();
 	Systick_init();
-
 	//*******************Init GPIOs
-	GPIO_LCD_Init();
+	ILI9341_Init();
 	Tim11_init();
 //	GPIO_SD_Init();
 //	GPIO_UART_Init();
